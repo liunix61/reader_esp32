@@ -23,6 +23,7 @@ void rec_file_exit();
 void del_op_back_menu();
 void del_book_reset_filelist();
 void reset_books_file();
+void book_list_not_empty_enter();
 
 
 // 菜单相关
@@ -72,7 +73,7 @@ MenuAction m_home = {
     .last_menus_len = 0,
     .param_val = "",
     .display = &display,
-    .enter_call = &enter_menu,
+    .enter_call = &book_list_not_empty_enter,
     .choose_call = &next_menu,
     .back_call = &no_op,
     .level = 0
@@ -444,6 +445,26 @@ void twice_enter_menu() {
 */
 void enter_menu(void) {
     if (!curr_m->next_menus) {
+        return;
+    }
+    // 切换下级菜单
+    curr_m = (curr_m->next_menus)[menu_pos];
+    // 光标切换到下级菜单0位置
+    menu_pos = 0;
+    // 切换菜单后，初始化滚动条
+    init_menu_scroll();
+    // 刷新显示
+    // display();
+    curr_m->display();
+}
+
+// home菜单下，判断书籍列表没有数据，不进入该菜单
+void book_list_not_empty_enter() {
+    if (!curr_m->next_menus) {
+        return;
+    }
+    if (((curr_m->next_menus)[menu_pos]) == (&m_book_list) && !file_list) {
+        // 选中书籍列表，但是没有书籍，不能进入下级菜单
         return;
     }
     // 切换下级菜单
